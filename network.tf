@@ -19,7 +19,7 @@ resource "azurerm_resource_group" "rg" {
   location = var.location
 }
 
-#Create a virtual network
+# Create a virtual network
 resource "azurerm_virtual_network" "vnet" {
   name                = var.virtual_network_name
   address_space       = ["10.0.0.0/24"]
@@ -27,7 +27,7 @@ resource "azurerm_virtual_network" "vnet" {
   resource_group_name = var.resource_group_name
 }
 
-# #create subnets
+# # #create subnets
 
 #publice 
 resource "azurerm_subnet" "public" {
@@ -42,14 +42,14 @@ resource "azurerm_subnet" "privete" {
   resource_group_name  = var.resource_group_name
   virtual_network_name = var.virtual_network_name
   address_prefixes     = ["10.0.0.88/29"]
-  delegation {
-    name = "delegation"
+  # delegation {
+  #   name = "delegation"
 
-    service_delegation {
-      name    = "Microsoft.DBforPostgreSQL/flexibleServers"
-      actions = ["Microsoft.Network/virtualNetworks/subnets/join/action", "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action"]
-    }
-  }
+  #   service_delegation {
+  #     name    = "Microsoft.DBforPostgreSQL/flexibleServers"
+  #     actions = ["Microsoft.Network/virtualNetworks/subnets/join/action", "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action"]
+  #   }
+  # }
 }
 # Create public IPs
 resource "azurerm_public_ip" "publicIpApp" {
@@ -87,7 +87,7 @@ resource "random_string" "fqdn" {
 
 
 
-# Create Network Security Groups and rule
+# # Create Network Security Groups and rule
 
 #public
 resource "azurerm_network_security_group" "public_nsg" {
@@ -245,15 +245,15 @@ resource "azurerm_lb_rule" "lbnatrule" {
   disable_outbound_snat          = true
 }
 
-# # # resource "azurerm_lb_nat_rule" "nat" {
-# # #   resource_group_name            = var.resource_group_name
-# # #   loadbalancer_id                = azurerm_lb.LB.id
-# # #   name                           = "webAccess"
-# # #   protocol                       = "Tcp"
-# # #   frontend_port                  = 8080
-# # #   backend_port                   = 8080
-# # #   frontend_ip_configuration_name = "PublicIPAddress"
-# # # }
+# # # # # resource "azurerm_lb_nat_rule" "nat" {
+# # # # #   resource_group_name            = var.resource_group_name
+# # # # #   loadbalancer_id                = azurerm_lb.LB.id
+# # # # #   name                           = "webAccess"
+# # # # #   protocol                       = "Tcp"
+# # # # #   frontend_port                  = 8080
+# # # # #   backend_port                   = 8080
+# # # # #   frontend_ip_configuration_name = "PublicIPAddress"
+# # # # # }
 
 resource "azurerm_lb_outbound_rule" "outRule" {
   loadbalancer_id         = azurerm_lb.LB.id
@@ -268,19 +268,19 @@ resource "azurerm_lb_outbound_rule" "outRule" {
   }
 }
 
-# # privte DNS
+# # # privte DNS
 
-resource "azurerm_private_dns_zone" "dns" {
-  name                = "tracker.postgres.database.azure.com"
-  resource_group_name = var.resource_group_name
-}
+# resource "azurerm_private_dns_zone" "dns" {
+#   name                = "tracker.postgres.database.azure.com"
+#   resource_group_name = var.resource_group_name
+# }
 
-resource "azurerm_private_dns_zone_virtual_network_link" "dns_link" {
-  name                  = "dns_link"
-  private_dns_zone_name = azurerm_private_dns_zone.dns.name
-  virtual_network_id    = azurerm_virtual_network.vnet.id
-  resource_group_name   = var.resource_group_name
-}
+# # resource "azurerm_private_dns_zone_virtual_network_link" "dns_link" {
+# #   name                  = "dns_link"
+# #   private_dns_zone_name = azurerm_private_dns_zone.dns.name
+# #   virtual_network_id    = azurerm_virtual_network.vnet.id
+# #   resource_group_name   = var.resource_group_name
+# # }
 
 
 

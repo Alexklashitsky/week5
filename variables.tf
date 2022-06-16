@@ -1,5 +1,5 @@
 variable "resource_group_name" {
-  default = "week5"
+  default = "week5-test"
 }
 
 # variable "resource_group_name" {
