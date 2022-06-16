@@ -27,7 +27,7 @@ resource "azurerm_virtual_network" "vnet" {
   resource_group_name = var.resource_group_name
 }
 
-# # # #create subnets
+# # # # #create subnets
 
 #publice 
 resource "azurerm_subnet" "public" {
@@ -59,12 +59,12 @@ resource "azurerm_public_ip" "publicIpApp" {
   allocation_method   = "Static"
 
 }
-resource "azurerm_public_ip" "publicIpDB" {
-  name                = "DBServerPublicIp"
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  allocation_method   = "Static"
-}
+# resource "azurerm_public_ip" "publicIpDB" {
+#   name                = "DBServerPublicIp"
+#   location            = var.location
+#   resource_group_name = var.resource_group_name
+#   allocation_method   = "Static"
+# }
 
 
 resource "azurerm_public_ip" "publicIpLB" {
@@ -159,7 +159,7 @@ resource "azurerm_network_security_group" "privete_nsg" {
   }
 }
 
-# # # Create network interface
+# # # # Create network interface
 
 #app server
 resource "azurerm_network_interface" "appNic" {
@@ -178,30 +178,30 @@ resource "azurerm_network_interface" "appNic" {
 }
 
 
-#dbserver
+# #dbserver
 
-resource "azurerm_network_interface" "dbNic" {
-  name                = "dbNic"
-  location            = var.location
-  resource_group_name = var.resource_group_name
+# resource "azurerm_network_interface" "dbNic" {
+#   name                = "dbNic"
+#   location            = var.location
+#   resource_group_name = var.resource_group_name
 
-  ip_configuration {
-    name                          = "dbNic"
-    subnet_id                     = azurerm_subnet.privete.id
-    private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.publicIpDB.id
-  }
-}
+#   ip_configuration {
+#     name                          = "dbNic"
+#     subnet_id                     = azurerm_subnet.privete.id
+#     private_ip_address_allocation = "Dynamic"
+#     public_ip_address_id          = azurerm_public_ip.publicIpDB.id
+#   }
+# }
 
-# Connect the security group to the network subnets
-resource "azurerm_subnet_network_security_group_association" "public" {
-  subnet_id                 = azurerm_subnet.public.id
-  network_security_group_id = azurerm_network_security_group.public_nsg.id
-}
-resource "azurerm_subnet_network_security_group_association" "privete" {
-  subnet_id                 = azurerm_subnet.privete.id
-  network_security_group_id = azurerm_network_security_group.privete_nsg.id
-}
+# # Connect the security group to the network subnets
+# resource "azurerm_subnet_network_security_group_association" "public" {
+#   subnet_id                 = azurerm_subnet.public.id
+#   network_security_group_id = azurerm_network_security_group.public_nsg.id
+# }
+# resource "azurerm_subnet_network_security_group_association" "privete" {
+#   subnet_id                 = azurerm_subnet.privete.id
+#   network_security_group_id = azurerm_network_security_group.privete_nsg.id
+# }
 
 
 # #LB
@@ -245,15 +245,15 @@ resource "azurerm_lb_rule" "lbnatrule" {
   disable_outbound_snat          = true
 }
 
-# # # # # # resource "azurerm_lb_nat_rule" "nat" {
-# # # # # #   resource_group_name            = var.resource_group_name
-# # # # # #   loadbalancer_id                = azurerm_lb.LB.id
-# # # # # #   name                           = "webAccess"
-# # # # # #   protocol                       = "Tcp"
-# # # # # #   frontend_port                  = 8080
-# # # # # #   backend_port                   = 8080
-# # # # # #   frontend_ip_configuration_name = "PublicIPAddress"
-# # # # # # }
+# # # # # # # resource "azurerm_lb_nat_rule" "nat" {
+# # # # # # #   resource_group_name            = var.resource_group_name
+# # # # # # #   loadbalancer_id                = azurerm_lb.LB.id
+# # # # # # #   name                           = "webAccess"
+# # # # # # #   protocol                       = "Tcp"
+# # # # # # #   frontend_port                  = 8080
+# # # # # # #   backend_port                   = 8080
+# # # # # # #   frontend_ip_configuration_name = "PublicIPAddress"
+# # # # # # # }
 
 resource "azurerm_lb_outbound_rule" "outRule" {
   loadbalancer_id         = azurerm_lb.LB.id
@@ -270,17 +270,17 @@ resource "azurerm_lb_outbound_rule" "outRule" {
 
 # # # privte DNS
 
-# resource "azurerm_private_dns_zone" "dns" {
-#   name                = "tracker.postgres.database.azure.com"
-#   resource_group_name = var.resource_group_name
-# }
+resource "azurerm_private_dns_zone" "dns" {
+  name                = "tracker.postgres.database.azure.com"
+  resource_group_name = var.resource_group_name
+}
 
-# # resource "azurerm_private_dns_zone_virtual_network_link" "dns_link" {
-# #   name                  = "dns_link"
-# #   private_dns_zone_name = azurerm_private_dns_zone.dns.name
-# #   virtual_network_id    = azurerm_virtual_network.vnet.id
-# #   resource_group_name   = var.resource_group_name
-# # }
+resource "azurerm_private_dns_zone_virtual_network_link" "dns_link" {
+  name                  = "dns_link"
+  private_dns_zone_name = azurerm_private_dns_zone.dns.name
+  virtual_network_id    = azurerm_virtual_network.vnet.id
+  resource_group_name   = var.resource_group_name
+}
 
 
 

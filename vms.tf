@@ -1,8 +1,24 @@
+
+# scale set
 resource "azurerm_virtual_machine_scale_set" "scaleSet" {
   name                = "vmscaleset"
   location            = var.location
   resource_group_name = var.resource_group_name
-  upgrade_policy_mode = "Manual"
+  # upgrade_policy_mode = "Manual"
+
+    # automatic rolling upgrade
+  automatic_os_upgrade = true
+  upgrade_policy_mode  = "Rolling"
+
+  rolling_upgrade_policy {
+    max_batch_instance_percent              = 20
+    max_unhealthy_instance_percent          = 20
+    max_unhealthy_upgraded_instance_percent = 5
+    pause_time_between_batches              = "PT0S"
+  }
+
+health_probe_id = azurerm_lb_probe.LB.id
+  
 
   sku {
     name     = "Standard_DS1_v2"
@@ -56,62 +72,100 @@ resource "azurerm_virtual_machine_scale_set" "scaleSet" {
 
   #  tags = var.tags
 }
-# Create virtual machine terminal
-resource "azurerm_linux_virtual_machine" "terminal" {
-  name                  = "terminal"
-  location              = var.location
-  resource_group_name   = var.resource_group_name
-  network_interface_ids = [azurerm_network_interface.appNic.id]
-  size                  = "Standard_F2"
-  os_disk {
-    name                 = "myOsDisk"
-    caching              = "ReadWrite"
-    storage_account_type = "Standard_LRS"
+
+
+resource "azurerm_monitor_autoscale_setting" "AutoscaleSetting" {
+  name                = "myAutoscaleSetting"
+  resource_group_name = var.resource_group_name
+  location            = var.location
+  target_resource_id  = azurerm_virtual_machine_scale_set.scaleSet.id
+
+  profile {
+    name = "defaultProfile"
+
+    capacity {
+      default = 1
+      minimum = 1
+      maximum = 3
+    }
+
+    rule {
+      metric_trigger {
+        metric_name        = "Percentage CPU"
+        metric_resource_id = azurerm_virtual_machine_scale_set.scaleSet.id
+        time_grain         = "PT1M"
+        statistic          = "Average"
+        time_window        = "PT5M"
+        time_aggregation   = "Average"
+        operator           = "GreaterThan"
+        threshold          = 75
+        metric_namespace   = "microsoft.compute/virtualmachinescalesets"
+        dimensions {
+          name     = "AppName"
+          operator = "Equals"
+          values   = ["App1"]
+        }
+      }
+
+      scale_action {
+        direction = "Increase"
+        type      = "ChangeCount"
+        value     = "1"
+        cooldown  = "PT1M"
+      }
+    }
+
+    rule {
+      metric_trigger {
+        metric_name        = "Percentage CPU"
+        metric_resource_id = azurerm_virtual_machine_scale_set.scaleSet.id
+        time_grain         = "PT1M"
+        statistic          = "Average"
+        time_window        = "PT5M"
+        time_aggregation   = "Average"
+        operator           = "LessThan"
+        threshold          = 25
+      }
+
+      scale_action {
+        direction = "Decrease"
+        type      = "ChangeCount"
+        value     = "1"
+        cooldown  = "PT1M"
+      }
+    }
   }
 
-
-  source_image_reference {
-    publisher = "Canonical"
-    offer     = "UbuntuServer"
-    sku       = "18.04-LTS"
-    version   = "latest"
-  }
-
-  computer_name                   = "terminal"
-  admin_username                  = "app"
-  admin_password                  = var.secret
-  disable_password_authentication = false
-
+  
 }
-# Create virtual machine dbServer
-resource "azurerm_linux_virtual_machine" "dbserver" {
-  name                  = "DbServer"
-  location              = var.location
-  resource_group_name   = var.resource_group_name
-  network_interface_ids = [azurerm_network_interface.dbNic.id]
-  size                  = "Standard_D2_v2"
-  os_disk {
-    name                 = "myOsDbDisk"
-    caching              = "ReadWrite"
-    storage_account_type = "Standard_LRS"
-  }
+
+# # Create virtual machine terminal
+# resource "azurerm_linux_virtual_machine" "terminal" {
+#   name                  = "terminal"
+#   location              = var.location
+#   resource_group_name   = var.resource_group_name
+#   network_interface_ids = [azurerm_network_interface.appNic.id]
+#   size                  = "Standard_F2"
+#   os_disk {
+#     name                 = "myOsDisk"
+#     caching              = "ReadWrite"
+#     storage_account_type = "Standard_LRS"
+#   }
 
 
-  source_image_reference {
-    publisher = "Canonical"
-    offer     = "UbuntuServer"
-    sku       = "18.04-LTS"
-    version   = "latest"
-  }
+#   source_image_reference {
+#     publisher = "Canonical"
+#     offer     = "UbuntuServer"
+#     sku       = "18.04-LTS"
+#     version   = "latest"
+#   }
 
+#   computer_name                   = "terminal"
+#   admin_username                  = "app"
+#   admin_password                  = var.secret
+#   disable_password_authentication = false
 
-
-  computer_name                   = "appserver"
-  admin_username                  = "db"
-  admin_password                  = var.secret
-  disable_password_authentication = false
-
-}
+# }
 
 
 # resource "azurerm_postgresql_flexible_server" "psql" {
