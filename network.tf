@@ -27,7 +27,7 @@ resource "azurerm_virtual_network" "vnet" {
   resource_group_name = var.resource_group_name
 }
 
-# # #create subnets
+# # # #create subnets
 
 #publice 
 resource "azurerm_subnet" "public" {
@@ -159,7 +159,7 @@ resource "azurerm_network_security_group" "privete_nsg" {
   }
 }
 
-# # Create network interface
+# # # Create network interface
 
 #app server
 resource "azurerm_network_interface" "appNic" {
@@ -178,20 +178,20 @@ resource "azurerm_network_interface" "appNic" {
 }
 
 
-# # #dbserver
+#dbserver
 
-# # resource "azurerm_network_interface" "dbNic" {
-# #   name                = "dbNic"
-# #   location            = var.location
-# #   resource_group_name = var.resource_group_name
+resource "azurerm_network_interface" "dbNic" {
+  name                = "dbNic"
+  location            = var.location
+  resource_group_name = var.resource_group_name
 
-# #   ip_configuration {
-# #     name                          = "dbNic"
-# #     subnet_id                     = azurerm_subnet.privete.id
-# #     private_ip_address_allocation = "Dynamic"
-# #     public_ip_address_id          = azurerm_public_ip.publicIpDB.id
-# #   }
-# # }
+  ip_configuration {
+    name                          = "dbNic"
+    subnet_id                     = azurerm_subnet.privete.id
+    private_ip_address_allocation = "Dynamic"
+    public_ip_address_id          = azurerm_public_ip.publicIpDB.id
+  }
+}
 
 # Connect the security group to the network subnets
 resource "azurerm_subnet_network_security_group_association" "public" {
@@ -245,15 +245,15 @@ resource "azurerm_lb_rule" "lbnatrule" {
   disable_outbound_snat          = true
 }
 
-# # # # # resource "azurerm_lb_nat_rule" "nat" {
-# # # # #   resource_group_name            = var.resource_group_name
-# # # # #   loadbalancer_id                = azurerm_lb.LB.id
-# # # # #   name                           = "webAccess"
-# # # # #   protocol                       = "Tcp"
-# # # # #   frontend_port                  = 8080
-# # # # #   backend_port                   = 8080
-# # # # #   frontend_ip_configuration_name = "PublicIPAddress"
-# # # # # }
+# # # # # # resource "azurerm_lb_nat_rule" "nat" {
+# # # # # #   resource_group_name            = var.resource_group_name
+# # # # # #   loadbalancer_id                = azurerm_lb.LB.id
+# # # # # #   name                           = "webAccess"
+# # # # # #   protocol                       = "Tcp"
+# # # # # #   frontend_port                  = 8080
+# # # # # #   backend_port                   = 8080
+# # # # # #   frontend_ip_configuration_name = "PublicIPAddress"
+# # # # # # }
 
 resource "azurerm_lb_outbound_rule" "outRule" {
   loadbalancer_id         = azurerm_lb.LB.id

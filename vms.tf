@@ -1,117 +1,117 @@
-# resource "azurerm_virtual_machine_scale_set" "scaleSet" {
-#   name                = "vmscaleset"
-#   location            = var.location
-#   resource_group_name = var.resource_group_name
-#   upgrade_policy_mode = "Manual"
+resource "azurerm_virtual_machine_scale_set" "scaleSet" {
+  name                = "vmscaleset"
+  location            = var.location
+  resource_group_name = var.resource_group_name
+  upgrade_policy_mode = "Manual"
 
-#   sku {
-#     name     = "Standard_DS1_v2"
-#     tier     = "Standard"
-#     capacity = 1
-#   }
+  sku {
+    name     = "Standard_DS1_v2"
+    tier     = "Standard"
+    capacity = 1
+  }
 
-#   storage_profile_image_reference {
-#     publisher = "Canonical"
-#     offer     = "UbuntuServer"
-#     sku       = "16.04-LTS"
-#     version   = "latest"
-#   }
+  storage_profile_image_reference {
+    publisher = "Canonical"
+    offer     = "UbuntuServer"
+    sku       = "16.04-LTS"
+    version   = "latest"
+  }
 
-#   storage_profile_os_disk {
-#     name              = ""
-#     caching           = "ReadWrite"
-#     create_option     = "FromImage"
-#     managed_disk_type = "Standard_LRS"
-#   }
+  storage_profile_os_disk {
+    name              = ""
+    caching           = "ReadWrite"
+    create_option     = "FromImage"
+    managed_disk_type = "Standard_LRS"
+  }
 
-#   storage_profile_data_disk {
-#     lun           = 0
-#     caching       = "ReadWrite"
-#     create_option = "Empty"
-#     disk_size_gb  = 10
-#   }
+  storage_profile_data_disk {
+    lun           = 0
+    caching       = "ReadWrite"
+    create_option = "Empty"
+    disk_size_gb  = 10
+  }
 
-#   os_profile {
-#     computer_name_prefix = "vmlab"
-#     admin_username       = "app"
-#     admin_password       = var.secret
-#     # custom_data          = file("web.conf")
-#   }
+  os_profile {
+    computer_name_prefix = "vmlab"
+    admin_username       = "app"
+    admin_password       = var.secret
+    # custom_data          = file("web.conf")
+  }
 
-#   os_profile_linux_config {
-#     disable_password_authentication = false
-#   }
+  os_profile_linux_config {
+    disable_password_authentication = false
+  }
 
-#   network_profile {
-#     name    = "terraformnetworkprofile"
-#     primary = true
+  network_profile {
+    name    = "terraformnetworkprofile"
+    primary = true
 
-#     ip_configuration {
-#       name                                   = "IPConfiguration"
-#       subnet_id                              = azurerm_subnet.public.id
-#       load_balancer_backend_address_pool_ids = [azurerm_lb_backend_address_pool.backendPool.id]
-#       primary                                = true
-#     }
-#   }
+    ip_configuration {
+      name                                   = "IPConfiguration"
+      subnet_id                              = azurerm_subnet.public.id
+      load_balancer_backend_address_pool_ids = [azurerm_lb_backend_address_pool.backendPool.id]
+      primary                                = true
+    }
+  }
 
-#   #  tags = var.tags
-# }
-# # Create virtual machine terminal
-# resource "azurerm_linux_virtual_machine" "appserver" {
-#   name                  = "terminal"
-#   location              = var.location
-#   resource_group_name   = var.resource_group_name
-#   network_interface_ids = [azurerm_network_interface.appNic.id]
-#   size                  = "Standard_F2"
-#   os_disk {
-#     name                 = "myOsDisk"
-#     caching              = "ReadWrite"
-#     storage_account_type = "Standard_LRS"
-#   }
-
-
-#   source_image_reference {
-#     publisher = "Canonical"
-#     offer     = "UbuntuServer"
-#     sku       = "18.04-LTS"
-#     version   = "latest"
-#   }
-
-#   computer_name                   = "terminal"
-#   admin_username                  = "app"
-#   admin_password                  = var.secret
-#   disable_password_authentication = false
-
-# }
-# # Create virtual machine dbServer
-# resource "azurerm_linux_virtual_machine" "dbserver" {
-#   name                  = "DbServer"
-#   location              = var.location
-#   resource_group_name   = var.resource_group_name
-#   network_interface_ids = [azurerm_network_interface.appNic.id]
-#   size                  = "Standard_D2_v2"
-#   os_disk {
-#     name                 = "myOsDbDisk"
-#     caching              = "ReadWrite"
-#     storage_account_type = "Standard_LRS"
-#   }
+  #  tags = var.tags
+}
+# Create virtual machine terminal
+resource "azurerm_linux_virtual_machine" "terminal" {
+  name                  = "terminal"
+  location              = var.location
+  resource_group_name   = var.resource_group_name
+  network_interface_ids = [azurerm_network_interface.appNic.id]
+  size                  = "Standard_F2"
+  os_disk {
+    name                 = "myOsDisk"
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
 
 
-#   source_image_reference {
-#     publisher = "Canonical"
-#     offer     = "UbuntuServer"
-#     sku       = "18.04-LTS"
-#     version   = "latest"
-#   }
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "UbuntuServer"
+    sku       = "18.04-LTS"
+    version   = "latest"
+  }
+
+  computer_name                   = "terminal"
+  admin_username                  = "app"
+  admin_password                  = var.secret
+  disable_password_authentication = false
+
+}
+# Create virtual machine dbServer
+resource "azurerm_linux_virtual_machine" "dbserver" {
+  name                  = "DbServer"
+  location              = var.location
+  resource_group_name   = var.resource_group_name
+  network_interface_ids = [azurerm_network_interface.dbNic.id]
+  size                  = "Standard_D2_v2"
+  os_disk {
+    name                 = "myOsDbDisk"
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
+
+
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "UbuntuServer"
+    sku       = "18.04-LTS"
+    version   = "latest"
+  }
 
 
 
-#   computer_name                   = "appserver"
-#   admin_username                  = "db"
-#   admin_password                  = var.secret
-#   disable_password_authentication = false
+  computer_name                   = "appserver"
+  admin_username                  = "db"
+  admin_password                  = var.secret
+  disable_password_authentication = false
 
-# }
+}
 
 
 # resource "azurerm_postgresql_flexible_server" "psql" {
