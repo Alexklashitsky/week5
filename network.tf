@@ -42,14 +42,14 @@ resource "azurerm_subnet" "privete" {
   resource_group_name  = var.resource_group_name
   virtual_network_name = var.virtual_network_name
   address_prefixes     = ["10.0.0.88/29"]
-  # delegation {
-  #   name = "delegation"
+  delegation {
+    name = "delegation"
 
-  #   service_delegation {
-  #     name    = "Microsoft.DBforPostgreSQL/flexibleServers"
-  #     actions = ["Microsoft.Network/virtualNetworks/subnets/join/action", "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action"]
-  #   }
-  # }
+    service_delegation {
+      name    = "Microsoft.DBforPostgreSQL/flexibleServers"
+      actions = ["Microsoft.Network/virtualNetworks/subnets/join/action", "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action"]
+    }
+  }
 }
 # Create public IPs
 resource "azurerm_public_ip" "publicIpApp" {

@@ -1,143 +1,143 @@
 
 # scale set
-resource "azurerm_virtual_machine_scale_set" "scaleSet" {
-  name                = "vmscaleset"
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  # upgrade_policy_mode = "Manual"
+# resource "azurerm_virtual_machine_scale_set" "scaleSet" {
+#   name                = "vmscaleset"
+#   location            = var.location
+#   resource_group_name = var.resource_group_name
+#   # upgrade_policy_mode = "Manual"
 
-    # automatic rolling upgrade
-  automatic_os_upgrade = true
-  upgrade_policy_mode  = "Rolling"
+#     # automatic rolling upgrade
+#   automatic_os_upgrade = true
+#   upgrade_policy_mode  = "Rolling"
 
-  rolling_upgrade_policy {
-    max_batch_instance_percent              = 20
-    max_unhealthy_instance_percent          = 20
-    max_unhealthy_upgraded_instance_percent = 5
-    pause_time_between_batches              = "PT0S"
-  }
+#   rolling_upgrade_policy {
+#     max_batch_instance_percent              = 20
+#     max_unhealthy_instance_percent          = 20
+#     max_unhealthy_upgraded_instance_percent = 5
+#     pause_time_between_batches              = "PT0S"
+#   }
 
-health_probe_id = azurerm_lb_probe.LB.id
+# health_probe_id = azurerm_lb_probe.LB.id
   
 
-  sku {
-    name     = "Standard_DS1_v2"
-    tier     = "Standard"
-    capacity = 1
-  }
+#   sku {
+#     name     = "Standard_DS1_v2"
+#     tier     = "Standard"
+#     capacity = 1
+#   }
 
-  storage_profile_image_reference {
-    publisher = "Canonical"
-    offer     = "UbuntuServer"
-    sku       = "16.04-LTS"
-    version   = "latest"
-  }
+#   storage_profile_image_reference {
+#     publisher = "Canonical"
+#     offer     = "UbuntuServer"
+#     sku       = "16.04-LTS"
+#     version   = "latest"
+#   }
 
-  storage_profile_os_disk {
-    name              = ""
-    caching           = "ReadWrite"
-    create_option     = "FromImage"
-    managed_disk_type = "Standard_LRS"
-  }
+#   storage_profile_os_disk {
+#     name              = ""
+#     caching           = "ReadWrite"
+#     create_option     = "FromImage"
+#     managed_disk_type = "Standard_LRS"
+#   }
 
-  storage_profile_data_disk {
-    lun           = 0
-    caching       = "ReadWrite"
-    create_option = "Empty"
-    disk_size_gb  = 10
-  }
+#   storage_profile_data_disk {
+#     lun           = 0
+#     caching       = "ReadWrite"
+#     create_option = "Empty"
+#     disk_size_gb  = 10
+#   }
 
-  os_profile {
-    computer_name_prefix = "vmlab"
-    admin_username       = "app"
-    admin_password       = var.secret
-    # custom_data          = file("web.conf")
-  }
+#   os_profile {
+#     computer_name_prefix = "vmlab"
+#     admin_username       = "app"
+#     admin_password       = var.secret
+#     # custom_data          = file("web.conf")
+#   }
 
-  os_profile_linux_config {
-    disable_password_authentication = false
-  }
+#   os_profile_linux_config {
+#     disable_password_authentication = false
+#   }
 
-  network_profile {
-    name    = "terraformnetworkprofile"
-    primary = true
+#   network_profile {
+#     name    = "terraformnetworkprofile"
+#     primary = true
 
-    ip_configuration {
-      name                                   = "IPConfiguration"
-      subnet_id                              = azurerm_subnet.public.id
-      load_balancer_backend_address_pool_ids = [azurerm_lb_backend_address_pool.backendPool.id]
-      primary                                = true
-    }
-  }
+#     ip_configuration {
+#       name                                   = "IPConfiguration"
+#       subnet_id                              = azurerm_subnet.public.id
+#       load_balancer_backend_address_pool_ids = [azurerm_lb_backend_address_pool.backendPool.id]
+#       primary                                = true
+#     }
+#   }
 
-  #  tags = var.tags
-}
+#   #  tags = var.tags
+# }
 
 
-resource "azurerm_monitor_autoscale_setting" "AutoscaleSetting" {
-  name                = "myAutoscaleSetting"
-  resource_group_name = var.resource_group_name
-  location            = var.location
-  target_resource_id  = azurerm_virtual_machine_scale_set.scaleSet.id
+# resource "azurerm_monitor_autoscale_setting" "AutoscaleSetting" {
+#   name                = "myAutoscaleSetting"
+#   resource_group_name = var.resource_group_name
+#   location            = var.location
+#   target_resource_id  = azurerm_virtual_machine_scale_set.scaleSet.id
 
-  profile {
-    name = "defaultProfile"
+#   profile {
+#     name = "defaultProfile"
 
-    capacity {
-      default = 1
-      minimum = 1
-      maximum = 3
-    }
+#     capacity {
+#       default = 1
+#       minimum = 1
+#       maximum = 3
+#     }
 
-    rule {
-      metric_trigger {
-        metric_name        = "Percentage CPU"
-        metric_resource_id = azurerm_virtual_machine_scale_set.scaleSet.id
-        time_grain         = "PT1M"
-        statistic          = "Average"
-        time_window        = "PT5M"
-        time_aggregation   = "Average"
-        operator           = "GreaterThan"
-        threshold          = 75
-        metric_namespace   = "microsoft.compute/virtualmachinescalesets"
-        dimensions {
-          name     = "AppName"
-          operator = "Equals"
-          values   = ["App1"]
-        }
-      }
+#     rule {
+#       metric_trigger {
+#         metric_name        = "Percentage CPU"
+#         metric_resource_id = azurerm_virtual_machine_scale_set.scaleSet.id
+#         time_grain         = "PT1M"
+#         statistic          = "Average"
+#         time_window        = "PT5M"
+#         time_aggregation   = "Average"
+#         operator           = "GreaterThan"
+#         threshold          = 75
+#         metric_namespace   = "microsoft.compute/virtualmachinescalesets"
+#         dimensions {
+#           name     = "AppName"
+#           operator = "Equals"
+#           values   = ["App1"]
+#         }
+#       }
 
-      scale_action {
-        direction = "Increase"
-        type      = "ChangeCount"
-        value     = "1"
-        cooldown  = "PT1M"
-      }
-    }
+#       scale_action {
+#         direction = "Increase"
+#         type      = "ChangeCount"
+#         value     = "1"
+#         cooldown  = "PT1M"
+#       }
+#     }
 
-    rule {
-      metric_trigger {
-        metric_name        = "Percentage CPU"
-        metric_resource_id = azurerm_virtual_machine_scale_set.scaleSet.id
-        time_grain         = "PT1M"
-        statistic          = "Average"
-        time_window        = "PT5M"
-        time_aggregation   = "Average"
-        operator           = "LessThan"
-        threshold          = 25
-      }
+#     rule {
+#       metric_trigger {
+#         metric_name        = "Percentage CPU"
+#         metric_resource_id = azurerm_virtual_machine_scale_set.scaleSet.id
+#         time_grain         = "PT1M"
+#         statistic          = "Average"
+#         time_window        = "PT5M"
+#         time_aggregation   = "Average"
+#         operator           = "LessThan"
+#         threshold          = 25
+#       }
 
-      scale_action {
-        direction = "Decrease"
-        type      = "ChangeCount"
-        value     = "1"
-        cooldown  = "PT1M"
-      }
-    }
-  }
+#       scale_action {
+#         direction = "Decrease"
+#         type      = "ChangeCount"
+#         value     = "1"
+#         cooldown  = "PT1M"
+#       }
+#     }
+#   }
 
   
-}
+# }
 
 # # Create virtual machine terminal
 # resource "azurerm_linux_virtual_machine" "terminal" {
@@ -168,62 +168,62 @@ resource "azurerm_monitor_autoscale_setting" "AutoscaleSetting" {
 # }
 
 
-# resource "azurerm_postgresql_flexible_server" "psql" {
-#   name                   = "psql"
-#   resource_group_name    = var.resource_group_name
-#   location               = var.location
-#   version                = "13" # "12"
-#   delegated_subnet_id    = azurerm_subnet.privete.id
-#   private_dns_zone_id    = azurerm_private_dns_zone.dns.id
-#   administrator_login    = "alex"
-#   administrator_password = var.secret
-#   zone                   = "1"
-#   create_mode            = "Default"
-#   storage_mb             = 32768
+resource "azurerm_postgresql_flexible_server" "psqlservice" {
+  name                   = "psqlservice"
+  resource_group_name    = var.resource_group_name
+  location               = var.location
+  version                = "13" # "12"
+  delegated_subnet_id    = azurerm_subnet.privete.id
+  private_dns_zone_id    = azurerm_private_dns_zone.dns.id
+  administrator_login    = "alex"
+  administrator_password = var.secret
+  zone                   = "1"
+  create_mode            = "Default"
+  storage_mb             = 32768
 
-#   #  virtual_network_id    = azurerm_virtual_network.vnet.id #my edit
-
-
-#   # sku_name = "GP_Standard_D4s_v3"
-#   sku_name = "B_Standard_B1ms"
+  #  virtual_network_id    = azurerm_virtual_network.vnet.id #my edit
 
 
-#   #   tags = {
-#   #   name = var.tags
-#   # }
-#   depends_on = [azurerm_private_dns_zone_virtual_network_link.dns_link] #my edit
+  # sku_name = "GP_Standard_D4s_v3"
+  sku_name = "B_Standard_B1ms"
+
+
+  #   tags = {
+  #   name = var.tags
+  # }
+  depends_on = [azurerm_private_dns_zone_virtual_network_link.dns_link] #my edit
 
 
 
-# }
-# resource "azurerm_postgresql_flexible_server_database" "db" {
-#   name      = "postgres"
-#   server_id = azurerm_postgresql_flexible_server.psql.id
-#   collation = "en_US.utf8"
-#   charset   = "utf8"
+}
+resource "azurerm_postgresql_flexible_server_database" "db" {
+  name      = "postgres-db"
+  server_id = azurerm_postgresql_flexible_server.psqlservice.id
+  collation = "en_US.utf8"
+  charset   = "utf8"
 
-# }
+}
 
-# resource "azurerm_postgresql_flexible_server_firewall_rule" "fwconfig" {
-#   name      = "example-fw"
-#   server_id = azurerm_postgresql_flexible_server.psql.id
+resource "azurerm_postgresql_flexible_server_firewall_rule" "fwconfig" {
+  name      = "example-fw"
+  server_id = azurerm_postgresql_flexible_server.psqlservice.id
 
-#   start_ip_address = "0.0.0.0"
-#   end_ip_address   = "255.255.255.255"
+  start_ip_address = "0.0.0.0"
+  end_ip_address   = "255.255.255.255"
 
-# }
-# resource "azurerm_postgresql_flexible_server_configuration" "flexible_server_configuration" {
-#   name      = "require_secure_transport"
-#   server_id = azurerm_postgresql_flexible_server.psql.id
-#   value     = "off"
+}
+resource "azurerm_postgresql_flexible_server_configuration" "flexible_server_configuration" {
+  name      = "require_secure_transport"
+  server_id = azurerm_postgresql_flexible_server.psqlservice.id
+  value     = "off"
 
 
-# }
+}
 
 
 
 # resource "azurerm_postgresql_flexible_server" "SQL" {
-#   name                   = "psqlflexibleserver"
+#   name                   = "psqlserviceflexibleserver"
 #   resource_group_name    = var.resource_group_name
 #   location               = var.location
 #   version                = "12"
