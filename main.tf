@@ -9,12 +9,12 @@ terraform {
   }
 
   required_version = ">= 1.1.0"
-  backend "azurerm" {
-    resource_group_name  = "week5"
-    storage_account_name = "backendstorage2022"
-    container_name       = "state"
-    key                  = "prod.terraform.tfstate"
-  }
+  #   backend "azurerm" {
+  #     resource_group_name  = "week5"
+  #     storage_account_name = "backendstorage2022"
+  #     container_name       = "state"
+  #     key                  = "prod.terraform.tfstate"
+  #   }
 }
 
 provider "azurerm" {

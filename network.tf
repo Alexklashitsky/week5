@@ -21,6 +21,7 @@ resource "azurerm_subnet" "privete" {
   resource_group_name  = azurerm_resource_group.rg.name
   virtual_network_name = azurerm_virtual_network.vnet.name
   address_prefixes     = ["10.0.0.88/29"]
+  #   delegation for the DB
   delegation {
     name = "delegation"
 
@@ -31,6 +32,8 @@ resource "azurerm_subnet" "privete" {
   }
 }
 # Create public IPs
+
+# Relay machine ip
 resource "azurerm_public_ip" "publicIpApp" {
   name                = "appServerPublicIp"
   location            = var.location
@@ -38,14 +41,7 @@ resource "azurerm_public_ip" "publicIpApp" {
   allocation_method   = "Static"
 
 }
-resource "azurerm_public_ip" "publicIpDB" {
-  name                = "DBServerPublicIp"
-  location            = var.location
-  resource_group_name = azurerm_resource_group.rg.name
-  allocation_method   = "Static"
-}
-
-
+# lb ip
 resource "azurerm_public_ip" "publicIpLB" {
   name                = "LBServerPublicIp"
   location            = var.location
@@ -73,17 +69,6 @@ resource "azurerm_network_security_group" "public_nsg" {
   name                = "public_nsg"
   location            = var.location
   resource_group_name = azurerm_resource_group.rg.name
-  security_rule {
-    name                       = "anyany"
-    priority                   = 250
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "*"
-    source_port_range          = "*"
-    destination_port_range     = "*"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
 
   security_rule {
     name                       = "SSH"
@@ -93,7 +78,7 @@ resource "azurerm_network_security_group" "public_nsg" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "22"
-    source_address_prefix      = "*"
+    source_address_prefix      = "77.137.66.121"
     destination_address_prefix = "*"
   }
   security_rule {
@@ -122,7 +107,7 @@ resource "azurerm_network_security_group" "privete_nsg" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "22"
-    source_address_prefix      = "*"
+    source_address_prefix      = "10.0.0.0/26"
     destination_address_prefix = "*"
   }
   security_rule {
@@ -136,7 +121,19 @@ resource "azurerm_network_security_group" "privete_nsg" {
     source_address_prefix      = "10.0.0.0/26"
     destination_address_prefix = "*"
   }
+  security_rule {
+    name                       = "DenyAllInBound"
+    priority                   = 4000
+    direction                  = "Inbound"
+    access                     = "Deny"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
 }
+
 
 # # # Create network interface
 
