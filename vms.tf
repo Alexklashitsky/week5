@@ -34,9 +34,8 @@ resource "azurerm_virtual_machine_scale_set" "scaleSet" {
 
   os_profile {
     computer_name_prefix = "vmlab"
-    admin_username       = "app"
+    admin_username       = var.admin_user
     admin_password       = var.secret
-    # custom_data          = file("web.conf")
   }
 
   os_profile_linux_config {
@@ -143,7 +142,7 @@ resource "azurerm_linux_virtual_machine" "terminal" {
   }
 
   computer_name                   = "terminal"
-  admin_username                  = "app"
+  admin_username                  = var.admin_user
   admin_password                  = var.secret
   disable_password_authentication = false
 

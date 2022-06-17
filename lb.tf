@@ -25,7 +25,7 @@ resource "azurerm_lb_backend_address_pool" "backendPool" {
 resource "azurerm_lb_probe" "LB" {
   loadbalancer_id = azurerm_lb.LB.id
   name            = "ssh-running-probe"
-  port            = "8080"
+  port            = var.application_port
 }
 
 # lb rules
@@ -34,8 +34,8 @@ resource "azurerm_lb_rule" "lbnatrule" {
   loadbalancer_id                = azurerm_lb.LB.id
   name                           = "http"
   protocol                       = "Tcp"
-  frontend_port                  = 8080
-  backend_port                   = 8080
+  frontend_port                  = var.application_port
+  backend_port                   = var.application_port
   backend_address_pool_ids       = [azurerm_lb_backend_address_pool.backendPool.id]
   frontend_ip_configuration_name = "PublicIPAddress"
   probe_id                       = azurerm_lb_probe.LB.id

@@ -7,7 +7,7 @@ resource "azurerm_postgresql_flexible_server" "psqlservice" {
   version                = "13"
   delegated_subnet_id    = azurerm_subnet.privete.id
   private_dns_zone_id    = azurerm_private_dns_zone.dns.id
-  administrator_login    = "alex"
+  administrator_login    = var.db_admin_user
   administrator_password = var.secret
   zone                   = "1"
   create_mode            = "Default"
