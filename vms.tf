@@ -4,14 +4,14 @@
 #   name                = "1.0.0"
 #   image_name          = "app"
 #   gallery_name        = "gallry"
-#   resource_group_name = var.resource_group_name
+#   resource_group_name = azurerm_resource_group.rg.name
 
 # }
 
 resource "azurerm_virtual_machine_scale_set" "scaleSet" {
   name                = "vmscaleset"
   location            = var.location
-  resource_group_name = var.resource_group_name
+  resource_group_name = azurerm_resource_group.rg.name
   upgrade_policy_mode = "Manual"
 
   sku {
