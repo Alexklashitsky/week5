@@ -18,7 +18,7 @@ The infrastructure includes, among others:
 #### network
 
 
-The network (10.0.0.0 \ 26) is divided into two subnets
+The network (10.0.0.0 \ 24) is divided into two subnets
 - public (10.0.0.0/26)
 open to the word to app web acsess on port 8080,
 and for ssh acsess for the devaloper from specific ip address
@@ -42,5 +42,13 @@ with prob set of rules and outbend nat
 - public ip
 - mannge server ip (ssh connction)
 - admin passwords and username
+
+## Installation and runnin 
+- Download the files
+- sigin in to azure acuont
+- install terafrom
+- Choose passwords and name admin as you see fit and fill them in the variable file
+- run the network fille first and then the others
+- Enjoy your new environment
 
 
