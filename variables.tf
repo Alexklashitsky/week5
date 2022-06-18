@@ -14,12 +14,12 @@ variable "application_port" {
 }
 
 variable "secret" {
-  default = "Alex310224993"
+  default = "smoecoolpassword"
 }
 
 variable "admin_user" {
-  default = "app"
+  default = "secretadmin"
 }
 variable "db_admin_user" {
-  default = "alex"
+  default = "secretadmin"
 }
